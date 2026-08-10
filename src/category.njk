@@ -1,0 +1,31 @@
+---
+layout: base.njk
+pagination:
+  data: clubs.categories
+  size: 1
+  alias: category
+permalink: "/categories/{{ category.slug }}/"
+eleventyComputed:
+  pageTitle: "{{ category.name }}"
+---
+
+{#
+  Every club with at least one contribution in this category, newest first.
+  `category.clubs` is built in src/_data/clubs.js and already deduplicated, so a
+  club with three poems in it appears once.
+#}
+
+<div class="page-heading">
+  <p class="page-heading__kicker">Category</p>
+  <h2 class="page-heading__title">{{ category.name }}</h2>
+  <p class="page-heading__sub">
+    {{ category.contributionCount }} contribution{% if category.contributionCount != 1 %}s{% endif %}
+    across {{ category.count }} half hour club{% if category.count != 1 %}s{% endif %}
+  </p>
+</div>
+
+<ul class="club-list">
+  {% for card in category.clubs %}
+    {% include "club-card.njk" %}
+  {% endfor %}
+</ul>

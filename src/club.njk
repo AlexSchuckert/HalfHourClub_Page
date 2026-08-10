@@ -1,0 +1,67 @@
+---
+layout: base.njk
+pagination:
+  data: clubs.all
+  size: 1
+  alias: club
+permalink: "/clubs/{{ club.slug }}/"
+pageScripts:
+  - /assets/gallery.js
+eleventyComputed:
+  pageTitle: "{{ club.title }}"
+---
+
+{#
+  One page per half hour club. Header carries the location, date, start and end
+  time and the full prompt; the contributions follow, collapsed by default.
+#}
+
+<article>
+  <header class="club-header">
+    <h2 class="club-header__title">{{ club.title }}</h2>
+    <p class="club-header__meta">
+      {% if club.location %}<span>{{ club.location }}</span>{% endif %}
+      <span>{{ club.dateLabel }}{% if club.timeLabel %}, {{ club.timeLabel }}{% endif %}</span>
+    </p>
+
+    {% if club.promptHtml %}
+      <div class="prompt">
+        <span class="prompt__label">Prompt</span>
+        {{ club.promptHtml | safe }}
+      </div>
+    {% endif %}
+  </header>
+
+  {% if club.contributions | length %}
+    <div class="contributions">
+      {% for contribution in club.contributions %}
+        {#
+          Collapsed by default — <details> with no `open` attribute. Native
+          disclosure means it still works with JavaScript switched off, and the
+          browser's own find-in-page can open it.
+        #}
+        <details class="contribution">
+          <summary class="contribution__summary">
+            <span class="contribution__caret" aria-hidden="true">▶</span>
+            <span class="contribution__who">{{ contribution.contributorLabel }}</span>
+            <span class="contribution__category tint-{{ clubs.colourByCategory[contribution.category] or 'plain' }}">
+              {{ contribution.category }}
+            </span>
+          </summary>
+          <div class="contribution__body">
+            {% if contribution.title %}
+              <h3 class="contribution__title">{{ contribution.title }}</h3>
+            {% endif %}
+            {{ contribution.bodyHtml | safe }}
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-note">Nothing recorded for this session yet.</p>
+  {% endif %}
+
+  <p class="club-footer-actions">
+    <a class="button button--quiet" href="/new/?edit={{ club.slug }}">Edit this club</a>
+  </p>
+</article>

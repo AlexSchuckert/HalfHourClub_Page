@@ -1,0 +1,159 @@
+---
+layout: base.njk
+permalink: /new/
+pageTitle: New half hour club
+hideNewButton: true
+pageStyles:
+  - /assets/vendor/easymde.min.css
+  - /assets/new/form.css
+# EasyMDE is a classic script and must be defined before app.js runs. base.njk
+# emits pageScripts (defer) ahead of pageModules, and the two share one
+# execution order, so `window.EasyMDE` is ready by the time the module starts.
+pageScripts:
+  - /assets/vendor/easymde.min.js
+pageModules:
+  - /assets/new/app.js
+---
+
+{#
+  Add, edit or delete a half hour club.
+
+  This page carries the publish key, which is why scripts/build.sh encrypts it
+  along with every other page — unlike the mooring wiki, whose /admin is left in
+  the clear because it holds nothing but the editor app.
+#}
+
+<div class="page-heading">
+  <p class="page-heading__kicker" data-mode-kicker>New</p>
+  <h2 class="page-heading__title" data-mode-title>Half hour club</h2>
+</div>
+
+{% if not site.publishKey %}
+  <p class="notice">
+    Publishing is switched off here because <code>HHC_PUBLISH_KEY</code> isn't set.
+    The form still works for looking at — it just can't save.
+  </p>
+{% endif %}
+
+<form id="club-form" novalidate>
+  <section class="panel form-section">
+    <div class="field">
+      <label for="field-title">Name of this half hour club</label>
+      <input id="field-title" name="title" type="text" required placeholder="Jesus and cicadas" />
+    </div>
+
+    <div class="field">
+      <label for="field-location">Where</label>
+      <div class="field__with-button">
+        <input id="field-location" name="location" type="text" placeholder="Kardamyli" />
+        <button class="button button--quiet" type="button" data-locate title="Find my location">
+          Locate me
+        </button>
+      </div>
+      <p class="field__hint" data-location-hint></p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="field-date">Date</label>
+        <input id="field-date" name="date" type="date" required />
+      </div>
+      <div class="field">
+        <label for="field-start">Start</label>
+        <input id="field-start" name="start" type="time" />
+      </div>
+      <div class="field">
+        <label for="field-end">End</label>
+        <input id="field-end" name="end" type="time" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="field-prompt">Prompt</label>
+      <textarea id="field-prompt" name="prompt" rows="3"
+        placeholder="Pretend to be Jesus and include Cicadas in some way"></textarea>
+    </div>
+  </section>
+
+  <h3 class="section__heading" style="margin-top: 2.25rem">Contributions</h3>
+  <div id="contributions"></div>
+
+  <p>
+    <button class="button" type="button" data-add-contribution>＋ Add a contribution</button>
+  </p>
+
+  <div class="publish-bar">
+    <button class="button button--primary" type="submit" data-publish>Publish</button>
+    {# Shown instead of Publish once a brand-new club has been saved. #}
+    <a class="button button--primary" data-finished href="/" hidden>Go to the club page</a>
+    <button class="button button--danger" type="button" data-delete hidden>Delete this club</button>
+    <p class="publish-bar__status" data-status role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+{#
+  One contribution: who made it, what kind of thing it is, the piece itself, and
+  anywhere to drop photos or video.
+#}
+<template id="contribution-template">
+  <section class="panel contribution-editor" data-contribution>
+    <div class="contribution-editor__head">
+      <span class="contribution-editor__index"></span>
+      <button class="contribution-editor__remove" type="button" data-remove title="Remove this contribution">
+        Remove
+      </button>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Who made it</label>
+        <input type="text" data-contributors placeholder="Ella, or Ella & Alex" list="known-contributors" />
+        <div class="quick-names" data-quick-names></div>
+      </div>
+
+      <div class="field">
+        <label>What kind</label>
+        <select data-category></select>
+        <input type="text" data-new-category placeholder="New category name" hidden />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>The contribution</label>
+      <textarea data-editor rows="6"></textarea>
+    </div>
+
+    <div class="dropzone" data-dropzone tabindex="0">
+      <p class="dropzone__label">
+        Drop photos or videos here, or <button type="button" data-pick>choose files</button>
+      </p>
+      <p class="dropzone__hint">
+        Photos are shrunk to 3 MB · videos are compressed on this device before uploading
+      </p>
+      <input type="file" data-file-input multiple accept="image/*,video/*" hidden />
+      <ul class="dropzone__list" data-attachments></ul>
+    </div>
+  </section>
+</template>
+
+<datalist id="known-contributors">
+  {% for contributor in clubs.contributors %}
+    <option value="{{ contributor.name }}"></option>
+  {% endfor %}
+</datalist>
+
+{#
+  Everything the form needs, inlined so it lives inside the encrypted page.
+  `publishKey` in particular must never be written to a separate file —
+  StatiCrypt only encrypts .html.
+#}
+<script id="form-config" type="application/json">{{
+  {
+    "publishKey": site.publishKey,
+    "repo": site.contentRepo,
+    "branch": site.contentBranch,
+    "categories": clubs.formData.categories,
+    "contributors": clubs.formData.contributors,
+    "clubs": clubs.formData.clubs
+  } | inlineJson | safe
+}}</script>

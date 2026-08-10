@@ -1,0 +1,30 @@
+---
+layout: base.njk
+pagination:
+  data: clubs.contributors
+  size: 1
+  alias: contributor
+permalink: "/contributors/{{ contributor.slug }}/"
+eleventyComputed:
+  pageTitle: "{{ contributor.name }}"
+---
+
+{#
+  Every club this person took part in. Joint contributions count for everyone
+  named on them, so a piece Ella and Alex made together shows on both pages.
+#}
+
+<div class="page-heading">
+  <p class="page-heading__kicker">Contributor</p>
+  <h2 class="page-heading__title">{{ contributor.name }}</h2>
+  <p class="page-heading__sub">
+    {{ contributor.contributionCount }} contribution{% if contributor.contributionCount != 1 %}s{% endif %}
+    across {{ contributor.count }} half hour club{% if contributor.count != 1 %}s{% endif %}
+  </p>
+</div>
+
+<ul class="club-list">
+  {% for card in contributor.clubs %}
+    {% include "club-card.njk" %}
+  {% endfor %}
+</ul>

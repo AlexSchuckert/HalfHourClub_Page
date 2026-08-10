@@ -1,0 +1,391 @@
+/* Styles for the add/edit form at /new/. Kept separate from theme.css so the
+   reading pages don't carry any of it. */
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.field label,
+.field > label {
+  font-family: var(--display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input[type='text'],
+.field input[type='date'],
+.field input[type='time'],
+.field select,
+.field textarea {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+  /* Stops iOS Safari zooming in when a field is focused. */
+  min-height: 2.75rem;
+}
+
+.field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.field__with-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.field__with-button input {
+  flex: 1 1 auto;
+}
+
+.field__with-button .button {
+  flex: none;
+  white-space: nowrap;
+}
+
+.field__hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.1rem;
+}
+
+@media (min-width: 34rem) {
+  .field-row {
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  }
+}
+
+/* --- Contribution editor ------------------------------------------------ */
+.contribution-editor {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.contribution-editor__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contribution-editor__index {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.contribution-editor__remove {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--rose);
+}
+
+.contribution-editor__remove:hover {
+  color: #96453d;
+}
+
+.quick-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+
+.quick-names button {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--cream-deep);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.quick-names button:hover {
+  background: var(--blue);
+  color: var(--ink);
+}
+
+/* --- Markdown editor ---------------------------------------------------- */
+/* EasyMDE ships its own chrome; nudge it towards the rest of the site. */
+.EasyMDEContainer .CodeMirror {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  background: var(--cream);
+  color: var(--ink);
+  border-color: var(--hairline);
+  border-radius: 0 0 10px 10px;
+}
+
+.EasyMDEContainer .editor-toolbar {
+  background: var(--cream-deep);
+  border-color: var(--hairline);
+  border-radius: 10px 10px 0 0;
+  opacity: 1;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+  color: var(--ink-soft) !important;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  width: auto;
+  min-width: 2rem;
+  padding: 0 0.5rem;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+  background: var(--blue);
+  border-color: transparent;
+}
+
+/* EasyMDE draws its toolbar with Font Awesome glyphs. We don't load Font
+   Awesome — it's a third-party icon font for seven buttons, and this site makes
+   no third-party requests — so the icons would render as nothing at all.
+   Label the buttons with type instead, which also suits the serif setting.
+   Only the button's own <i> is hidden; the "|" separators are <i> too. */
+.EasyMDEContainer .editor-toolbar button > i {
+  display: none;
+}
+
+.EasyMDEContainer .editor-toolbar button::after {
+  content: attr(aria-label);
+}
+
+.EasyMDEContainer .editor-toolbar button.bold::after {
+  content: 'B';
+  font-weight: 700;
+}
+
+.EasyMDEContainer .editor-toolbar button.italic::after {
+  content: 'I';
+  font-style: italic;
+}
+
+.EasyMDEContainer .editor-toolbar button.heading::after {
+  content: 'H';
+}
+
+.EasyMDEContainer .editor-toolbar button.quote::after {
+  content: 'Quote';
+}
+
+.EasyMDEContainer .editor-toolbar button.unordered-list::after {
+  content: 'List';
+}
+
+.EasyMDEContainer .editor-toolbar button.preview::after {
+  content: 'Preview';
+}
+
+.EasyMDEContainer .editor-toolbar button.guide::after {
+  content: 'Help';
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+  color: var(--hairline);
+}
+
+.EasyMDEContainer .editor-preview,
+.EasyMDEContainer .editor-preview-side {
+  background: var(--card);
+  font-family: var(--serif);
+}
+
+.EasyMDEContainer .editor-statusbar {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* --- Drop zone ---------------------------------------------------------- */
+.dropzone {
+  border: 1.5px dashed var(--hairline);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  background: var(--cream);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dropzone--over {
+  border-color: var(--dot);
+  background: var(--blue);
+}
+
+.dropzone__label {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.dropzone__label button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--dot);
+  cursor: pointer;
+}
+
+.dropzone__hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.dropzone__list {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.dropzone__list:empty {
+  display: none;
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+
+.attachment__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment__state {
+  flex: none;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.attachment--failed .attachment__state {
+  color: #96453d;
+  font-style: normal;
+}
+
+.attachment__bar {
+  flex: none;
+  width: 5rem;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cream-deep);
+  overflow: hidden;
+}
+
+.attachment__bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--dot);
+  transition: width 0.2s ease;
+}
+
+.attachment__remove {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* --- Publish bar --------------------------------------------------------
+   Sticks to the bottom so Publish is always in reach on a phone, however many
+   contributions the session had. It needs an opaque background and a z-index:
+   a translucent one lets the form show through and reads as broken overlap. */
+.publish-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: 2rem;
+  padding: 1rem 0;
+  background: var(--cream);
+  box-shadow: 0 -12px 16px -8px var(--cream), 0 -1px 0 var(--hairline);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Room to scroll the last contribution clear of the bar. */
+#club-form {
+  padding-bottom: 2rem;
+}
+
+.publish-bar__status {
+  margin: 0;
+  flex: 1 1 12rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.publish-bar__status--error {
+  color: #96453d;
+  font-style: normal;
+}
+
+.publish-bar__status--done {
+  color: #3f6b4a;
+  font-style: normal;
+}

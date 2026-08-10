@@ -1,0 +1,82 @@
+---
+layout: base.njk
+pageScripts:
+  - /assets/calendar.js
+---
+
+{#
+  The landing page after the password gate: calendar, then the two ways of
+  browsing sideways (category, contributor), then the most recent sessions.
+#}
+
+<section class="section">
+  <div class="panel">
+    <div class="calendar" id="calendar" data-latest-month="{{ clubs.monthOfLatest }}">
+      <div class="calendar__bar">
+        <button class="calendar__nav" type="button" data-calendar-prev aria-label="Previous month">‹</button>
+        <h2 class="calendar__month" data-calendar-month>&nbsp;</h2>
+        <button class="calendar__nav" type="button" data-calendar-next aria-label="Next month">›</button>
+      </div>
+      <div class="calendar__grid" data-calendar-grid></div>
+      <div class="calendar__choices" data-calendar-choices></div>
+      <noscript>
+        <p class="calendar__empty">The calendar needs JavaScript — the list of clubs below works without it.</p>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+{#
+  The calendar's data is inlined here, NOT written to a .json file. StatiCrypt
+  only encrypts .html, so a sidecar data file would hand every club title and
+  date to anyone who found the URL — no password needed. Same reasoning that
+  made the mooring wiki turn MkDocs search off.
+#}
+<script id="calendar-data" type="application/json">{{ clubs.calendarDays | inlineJson | safe }}</script>
+
+{% if clubs.categories | length %}
+  <section class="section">
+    <h2 class="section__heading">Categories</h2>
+    <ul class="chips">
+      {% for category in clubs.categories %}
+        <li>
+          <a class="chip tint-{{ category.colour }}" href="/categories/{{ category.slug }}/">
+            {{ category.name }}
+            <span class="chip__count">{{ category.count }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% if clubs.contributors | length %}
+  <section class="section">
+    <h2 class="section__heading">Contributors</h2>
+    <ul class="chips">
+      {% for contributor in clubs.contributors %}
+        <li>
+          <a class="chip chip--plain" href="/contributors/{{ contributor.slug }}/">
+            {{ contributor.name }}
+            <span class="chip__count">{{ contributor.count }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+<section class="section">
+  <h2 class="section__heading">Recent</h2>
+  {% if clubs.all | length %}
+    <ul class="club-list">
+      {% for card in clubs.all | take(8) %}
+        {% include "club-card.njk" %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty-note">
+      No half hour clubs yet. Tap <a href="/new/">＋ New half hour club</a> to add the first one.
+    </p>
+  {% endif %}
+</section>

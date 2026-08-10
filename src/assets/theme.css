@@ -1,0 +1,768 @@
+/* ==========================================================================
+   Half Hour Club — theme
+   Warm cream ground, pastel accents, Fraunces for display and EB Garamond for
+   reading. Mobile first: most clubs get added from a phone at the table.
+   ========================================================================== */
+
+/* --- Fonts ---------------------------------------------------------------
+   Self-hosted, so there's no third-party request and no round-trip before
+   text can paint. `swap` means words appear immediately in a fallback serif
+   and reflow once Garamond lands. */
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/assets/fonts/eb-garamond-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/assets/fonts/eb-garamond-400-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/assets/fonts/eb-garamond-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/fraunces-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/fraunces-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Palette ------------------------------------------------------------ */
+:root {
+  --cream: #fcf9f4;
+  --cream-deep: #f6f0e6;
+  --card: #fffdfa;
+  --ink: #3a3532;
+  --ink-soft: #5c554f;
+  --muted: #8a8078;
+  --hairline: #e6ddd0;
+
+  --rose: #e8c4c0;
+  --sage: #c5d4c0;
+  --blue: #bfd3e6;
+  --lavender: #d4c8e0;
+  --honey: #f0ddb8;
+  --clay: #e3c9b3;
+  --mint: #c2ddd6;
+
+  /* The calendar dot: a clear blue that still sits inside the pastel family. */
+  --dot: #7fa8d4;
+
+  --serif: 'EB Garamond', Iowan Old Style, Palatino, Georgia, serif;
+  --display: 'Fraunces', 'EB Garamond', Georgia, serif;
+
+  --measure: 62ch;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(58, 53, 50, 0.04), 0 8px 24px rgba(58, 53, 50, 0.06);
+  --shadow-lift: 0 2px 4px rgba(58, 53, 50, 0.06), 0 14px 36px rgba(58, 53, 50, 0.1);
+}
+
+/* Category chip colours, keyed by the `colour` in categories.yml. */
+.tint-rose { --tint: var(--rose); }
+.tint-sage { --tint: var(--sage); }
+.tint-blue { --tint: var(--blue); }
+.tint-lavender { --tint: var(--lavender); }
+.tint-honey { --tint: var(--honey); }
+.tint-clay { --tint: var(--clay); }
+.tint-mint { --tint: var(--mint); }
+
+/* --- Reset-ish ---------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.18rem;
+  line-height: 1.62;
+  /* Counterpart to the inline body{visibility:hidden} in base.njk: this
+     stylesheet loading is the signal that it's safe to paint, which avoids a
+     flash of unstyled serif-less text. Same trick as the mooring wiki. */
+  visibility: visible;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--ink);
+  text-decoration-color: var(--rose);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-color: var(--dot);
+}
+
+/* --- Layout ------------------------------------------------------------- */
+.shell {
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 5rem;
+}
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 2rem 0 1.5rem;
+}
+
+.masthead__title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.masthead__title a {
+  text-decoration: none;
+}
+
+.masthead__tagline {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin: 0.15rem 0 0;
+}
+
+/* The browser's own `[hidden] { display: none }` lives in the UA stylesheet, so
+   ANY author rule that sets `display` beats it — which quietly un-hides every
+   `.button[hidden]` on the page. Restate it here, with weight, so `hidden`
+   keeps meaning hidden. */
+[hidden] {
+  display: none !important;
+}
+
+/* --- Buttons ------------------------------------------------------------ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--dot);
+  border-color: var(--dot);
+  color: #fff;
+}
+
+.button--quiet {
+  box-shadow: none;
+  background: transparent;
+}
+
+.button--danger {
+  border-color: #d9a9a4;
+  color: #96453d;
+}
+
+/* --- Cards and sections ------------------------------------------------- */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem;
+}
+
+.section {
+  margin: 2.75rem 0 0;
+}
+
+.section__heading {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.9rem;
+}
+
+/* --- Calendar ----------------------------------------------------------- */
+.calendar {
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.calendar__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.calendar__month {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.calendar__nav {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.calendar__nav:hover:not(:disabled) {
+  background: var(--cream-deep);
+  color: var(--ink);
+}
+
+.calendar__nav:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15rem;
+}
+
+.calendar__weekday {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 0.35rem;
+}
+
+.calendar__day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink-soft);
+  padding: 0;
+}
+
+.calendar__day--empty {
+  visibility: hidden;
+}
+
+.calendar__day--today {
+  box-shadow: inset 0 0 0 1.5px var(--hairline);
+}
+
+.calendar__day--has-club {
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.calendar__day--has-club:hover,
+.calendar__day--has-club:focus-visible {
+  background: var(--blue);
+  outline: none;
+}
+
+.calendar__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+
+/* When two clubs share a day, the day expands into a small chooser rather
+   than guessing which one you meant. */
+.calendar__choices {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.calendar__choices:empty {
+  display: none;
+}
+
+.calendar__choice {
+  display: block;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  background: var(--cream-deep);
+  text-decoration: none;
+  font-size: 0.98rem;
+}
+
+.calendar__empty {
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin: 1rem 0 0;
+}
+
+/* --- Chip rows (categories, contributors) ------------------------------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--tint, var(--cream-deep));
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.98rem;
+  border: 1px solid rgba(58, 53, 50, 0.06);
+  transition: transform 0.15s ease;
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+}
+
+.chip__count {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  opacity: 0.75;
+}
+
+.chip--plain {
+  background: var(--cream-deep);
+}
+
+/* --- Club page ---------------------------------------------------------- */
+.club-header {
+  margin: 1rem 0 2.25rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.club-header__title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.65rem;
+}
+
+.club-header__meta {
+  color: var(--ink-soft);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.club-header__meta span + span::before {
+  content: '·';
+  margin: 0 0.5rem;
+  color: var(--muted);
+}
+
+.prompt {
+  margin: 1.4rem 0 0;
+  padding: 1.1rem 1.3rem;
+  background: var(--cream-deep);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--honey);
+}
+
+.prompt__label {
+  display: block;
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.prompt p {
+  margin: 0 0 0.6rem;
+}
+
+.prompt p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Contributions (collapsed by default) ------------------------------- */
+.contributions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contribution {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.contribution__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.15rem;
+}
+
+/* Hide the native disclosure triangle in favour of our own caret. */
+.contribution__summary::-webkit-details-marker {
+  display: none;
+}
+
+.contribution__summary::marker {
+  content: '';
+}
+
+.contribution__summary:hover {
+  background: var(--cream-deep);
+}
+
+.contribution__caret {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+
+.contribution[open] .contribution__caret {
+  transform: rotate(90deg);
+}
+
+.contribution__who {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.contribution__category {
+  flex: none;
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  background: var(--tint, var(--cream-deep));
+  color: var(--ink-soft);
+}
+
+.contribution__body {
+  padding: 0.25rem 1.25rem 1.4rem;
+  max-width: var(--measure);
+}
+
+.contribution__body > :first-child {
+  margin-top: 0;
+}
+
+.contribution__body > :last-child {
+  margin-bottom: 0;
+}
+
+.contribution__title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin: 0 0 0.6rem;
+}
+
+/* --- Media inside contributions ---------------------------------------- */
+.media {
+  display: block;
+  margin: 1.1rem 0;
+}
+
+.media-image {
+  display: block;
+  border-radius: 10px;
+  max-height: 76vh;
+  width: auto;
+  margin: 1.1rem auto;
+  cursor: zoom-in;
+  box-shadow: var(--shadow);
+}
+
+.media-video video,
+.media-audio audio {
+  width: 100%;
+  border-radius: 10px;
+  display: block;
+}
+
+.media-caption {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+/* --- Lightbox ----------------------------------------------------------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(43, 39, 36, 0.92);
+  border: none;
+  padding: 1.5rem;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 88vh;
+  border-radius: 8px;
+}
+
+.lightbox__caption {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 253, 250, 0.85);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.lightbox__arrow,
+.lightbox__close {
+  position: absolute;
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: 50%;
+  width: 2.6rem;
+  height: 2.6rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox__arrow:hover,
+.lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.lightbox__prev { left: 0.9rem; }
+.lightbox__next { right: 0.9rem; }
+.lightbox__close { top: 0.9rem; right: 0.9rem; width: 2.2rem; height: 2.2rem; font-size: 1.1rem; }
+
+/* --- Club list (home, category and contributor pages) ------------------- */
+.club-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.club-card {
+  display: block;
+  padding: 1.2rem 1.35rem;
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.club-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.club-card__title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  margin: 0 0 0.3rem;
+}
+
+.club-card__meta {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0 0 0.6rem;
+}
+
+.club-card__prompt {
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 0.75rem;
+}
+
+.club-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.club-card__chip {
+  font-size: 0.78rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: var(--tint, var(--cream-deep));
+  color: var(--ink-soft);
+}
+
+.club-footer-actions {
+  margin-top: 2.5rem;
+}
+
+/* --- Page heading for list pages --------------------------------------- */
+.page-heading {
+  margin: 1rem 0 2rem;
+}
+
+.page-heading__kicker {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.page-heading__title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.page-heading__sub {
+  color: var(--muted);
+  margin: 0.4rem 0 0;
+}
+
+/* --- Footer and misc --------------------------------------------------- */
+.footer {
+  margin-top: 4rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 0.88rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.empty-note {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.notice {
+  margin: 0 0 1.5rem;
+  padding: 0.8rem 1.1rem;
+  border-radius: 10px;
+  background: var(--honey);
+  color: #5a4a25;
+  font-size: 0.95rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

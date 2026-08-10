@@ -1,0 +1,26 @@
+{
+  "name": "halfhourclub-page",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Password-gated archive of Half Hour Clubs — build pipeline and theme.",
+  "scripts": {
+    "serve": "bash scripts/serve.sh",
+    "build": "bash scripts/build.sh",
+    "eleventy": "eleventy",
+    "test": "bash test/run.sh",
+    "test:functions": "node test/functions.test.mjs"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "@fontsource/eb-garamond": "^5.3.0",
+    "@fontsource/fraunces": "^5.3.0",
+    "easymde": "^2.21.0",
+    "gray-matter": "^4.0.3",
+    "heic-to": "^1.5.2",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
+    "mediabunny": "^1.53.0",
+    "sanitize-html": "^2.17.6"
+  }
+}

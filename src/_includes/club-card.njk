@@ -1,0 +1,24 @@
+{#
+  One club in a blog-like list. Used by the home page and by both the category
+  and contributor pages, so they stay identical.
+#}
+<li>
+  <a class="club-card" href="{{ card.url }}">
+    <h3 class="club-card__title">{{ card.title }}</h3>
+    <p class="club-card__meta">
+      {{ card.dateLabel }}{% if card.timeLabel %}, {{ card.timeLabel }}{% endif %}{% if card.location %} · {{ card.location }}{% endif %}
+    </p>
+    {% if card.promptText %}
+      <p class="club-card__prompt">{{ card.promptText | truncate(160) }}</p>
+    {% endif %}
+    {% if card.contributions | length %}
+      <div class="club-card__chips">
+        {% for contribution in card.contributions %}
+          <span class="club-card__chip tint-{{ clubs.colourByCategory[contribution.category] or 'plain' }}">
+            {{ contribution.contributorLabel }} — {{ contribution.category }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </a>
+</li>

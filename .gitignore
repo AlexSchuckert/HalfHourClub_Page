@@ -1,0 +1,27 @@
+# Build output
+/_site/
+
+# Club content is fetched from the separate private content repo at build
+# time — it is NOT stored here.
+/content/
+
+# Node
+/node_modules/
+# package-lock.json IS committed on purpose: it pins the exact dependency tree
+# so a Netlify build a year from now produces the same site as one today.
+
+# StatiCrypt's generated config (everything is passed on the command line)
+.staticrypt.json
+
+# OS noise
+.DS_Store
+
+# Local tooling config (not part of the site)
+.claude/
+
+# Never commit secrets. The site password, publish key and GitHub App private
+# key all live in Netlify's environment variables. If you create a .env for
+# local testing, it stays here and out of git.
+.env
+.env.*
+*.pem
