@@ -41,6 +41,47 @@ function keyMatches(candidate, expected) {
   return timingSafeEqual(Buffer.from(candidate), Buffer.from(expected));
 }
 
+const CONTENT_REPO = () => process.env.HHC_CONTENT_REPO || 'AlexSchuckert/HalfHourClub_Content';
+
+/**
+ * Which branch the form should read and write.
+ *
+ * Do NOT assume "main". A freshly created repo whose first push was a feature
+ * branch has no main at all, and GitHub makes that first branch the default —
+ * at which point the build (scripts/fetch-content.sh runs `git clone`, which
+ * checks out the default branch) and the publishing form would be looking at
+ * two different places. Hardcoding "main" here is what produced
+ *
+ *     GitHub said 404 … /rest/git/refs#get-a-reference
+ *
+ * on save while the site itself built perfectly. Asking the repo for its own
+ * default branch keeps the two in step by construction, whatever it's called.
+ *
+ * `HHC_CONTENT_BRANCH` overrides, for pinning to a branch that isn't default.
+ */
+export async function resolveBranch(token, repo) {
+  if (process.env.HHC_CONTENT_BRANCH) return process.env.HHC_CONTENT_BRANCH;
+
+  const response = await fetch(`https://api.github.com/repos/${repo}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'HalfHourClub-Site',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not read ${repo} (${response.status}). Check that the GitHub App ` +
+        `is installed on that repository.`
+    );
+  }
+
+  const { default_branch: defaultBranch } = await response.json();
+  return defaultBranch || 'main';
+}
+
 export default async function handler(request) {
   if (request.method !== 'POST') {
     return reply(405, { error: 'Use POST.' });
@@ -68,11 +109,12 @@ export default async function handler(request) {
 
   try {
     const { token, expiresAt } = await mintInstallationToken();
+    const repo = CONTENT_REPO();
     return reply(200, {
       token,
       expiresAt,
-      repo: process.env.HHC_CONTENT_REPO || 'AlexSchuckert/HalfHourClub_Content',
-      branch: process.env.HHC_CONTENT_BRANCH || 'main',
+      repo,
+      branch: await resolveBranch(token, repo),
     });
   } catch (error) {
     // The message can name a missing env var, which is useful and not secret.

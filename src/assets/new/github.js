@@ -53,11 +53,48 @@ async function gh(token, path, options = {}) {
   });
 
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`GitHub said ${response.status}: ${detail.slice(0, 300)}`);
+    throw new Error(await explainFailure(response, path));
   }
 
   return response.status === 204 ? null : response.json();
+}
+
+/**
+ * Turn a GitHub error into something worth reading.
+ *
+ * A bare "GitHub said 404" sends you to the wrong place: GitHub answers 404
+ * rather than 403 for anything a token can't see, so the same status covers a
+ * missing branch, a repo the App isn't installed on, and a genuine typo. Name
+ * which call failed and what the likely causes are.
+ */
+async function explainFailure(response, path) {
+  const detail = (await response.text().catch(() => '')).slice(0, 200);
+  const what = path.replace(/^\/repos\/[^/]+\/[^/]+/, '');
+
+  if (response.status === 404) {
+    return (
+      `GitHub couldn't find ${what} (404). Usually one of:\n` +
+      `• the branch doesn't exist in the archive repository\n` +
+      `• the GitHub App isn't installed on that repository\n` +
+      `• the club was renamed or deleted since this page loaded`
+    );
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    return (
+      `GitHub refused the request (${response.status}) for ${what}. The publishing ` +
+      `token may have expired — reload the page and try again.`
+    );
+  }
+
+  if (response.status === 409 || response.status === 422) {
+    return (
+      `GitHub rejected the change (${response.status}) for ${what}. Someone may have ` +
+      `edited the archive at the same moment — reload and redo the change. ${detail}`
+    );
+  }
+
+  return `GitHub said ${response.status} for ${what}: ${detail}`;
 }
 
 /** Binary → base64, in chunks so a 50 MB video doesn't blow the call stack. */

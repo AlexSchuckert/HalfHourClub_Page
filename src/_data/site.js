@@ -13,10 +13,14 @@ export default {
   title: 'Half Hour Club',
   tagline: 'Thirty minutes, one prompt, whatever we make',
 
-  /** The content repo the publishing form writes to. */
-  contentRepo: 'AlexSchuckert/HalfHourClub_Content',
-  contentBranch: 'main',
-
   publishKey: process.env.HHC_PUBLISH_KEY || '',
 
+  /*
+   * Which repo and branch the form writes to is deliberately NOT here.
+   * netlify/functions/auth.mjs returns both with the token, reading the branch
+   * from the repository's own default — so the form always writes where
+   * scripts/fetch-content.sh reads. A second copy in this file could drift out
+   * of step, which is exactly the bug that made saving 404 while the site built
+   * fine.
+   */
 };

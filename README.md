@@ -254,6 +254,12 @@ see [test/README.md](test/README.md).
   It's the same trade-off the mooring wiki makes with `img/`.
 - **Adding a category needs no config change.** Type it into the form's category
   box. `categories.yml` in the content repo only pins order and colour.
+- **The branch is never assumed.** `/api/auth` asks the content repo for its own
+  default branch and the form uses that, so it always writes where the build
+  reads (`git clone` checks out the default branch too). If you keep the archive
+  somewhere other than the default branch, set `HHC_CONTENT_BRANCH` in Netlify.
+  A repo whose first push was a feature branch has no `main` at all, which is
+  why nothing here hardcodes one.
 - **Anyone with the password can add, edit and delete.** That's the design: one
   password, a visible ＋ button. The blast radius is small — the token is scoped
   to the content repo, expires in an hour, and every change is a git commit you

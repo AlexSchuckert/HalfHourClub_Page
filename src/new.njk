@@ -147,11 +147,14 @@ pageModules:
   `publishKey` in particular must never be written to a separate file —
   StatiCrypt only encrypts .html.
 #}
+{#
+  No repo or branch here on purpose. /api/auth returns both alongside the token,
+  resolved from the repository itself, so there's a single source of truth — a
+  copy baked in at build time could disagree with the one the build reads from.
+#}
 <script id="form-config" type="application/json">{{
   {
     "publishKey": site.publishKey,
-    "repo": site.contentRepo,
-    "branch": site.contentBranch,
     "categories": clubs.formData.categories,
     "contributors": clubs.formData.contributors,
     "clubs": clubs.formData.clubs
