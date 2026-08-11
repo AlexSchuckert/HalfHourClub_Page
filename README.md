@@ -13,15 +13,21 @@ club from the same page.
 | Repo | Holds | Who can write |
 |------|-------|---------------|
 | **`HalfHourClub_Content`** (private) | The archive: club markdown, photos, videos | Anyone with the family password, through the site's form |
-| **`HalfHourClub_Page`** (this one, private) | Build pipeline, theme, functions, **and the secrets** | Only you |
+| **`HalfHourClub_Page`** (this one, public) | Build pipeline, theme, functions | Only you |
+
+**No secret lives in either repo.** The family password, the publish key and the
+GitHub App key are all Netlify environment variables, which is why this repo can
+be public without exposing anything. The one credential-shaped thing committed
+here is StatiCrypt's salt in `scripts/build.sh`, and that is published inside
+every page by design — only the password protects the content.
 
 The split is a deliberate safety boundary, the same one the mooring wiki uses.
 The credential the publishing form gets can write to the *content* repo only,
-which has **no build scripts and no secrets** — so a family member can add a
-poem but cannot steal the reader password or hijack the build. As a second
-layer, the build (here, out of their reach) runs contributed markdown through a
-[sanitiser](lib/render.mjs) that **strips any `<script>` or other executable
-HTML**, so injected code can't reach readers either.
+which has **no build scripts** — so a family member can add a poem but cannot
+hijack the build. As a second layer, the build (here, out of their reach) runs
+contributed markdown through a [sanitiser](lib/render.mjs) that **strips any
+`<script>` or other executable HTML**, so injected code can't reach readers
+either.
 
 ## How it works
 
@@ -37,7 +43,7 @@ HTML**, so injected code can't reach readers either.
         │                    browser commits straight to GitHub
         │                    (one commit, media included)
         ▼                                              ▼
-  HalfHourClub_Page (private)  ◀── build ───  HalfHourClub_Content (private)
+  HalfHourClub_Page (public)   ◀── build ───  HalfHourClub_Content (private)
    Eleventy templates, theme,     fetch         clubs/**.md + media/
    functions, build scripts       content       push → Action → build hook
 ```
@@ -74,12 +80,21 @@ You'll create one GitHub App and set five environment variables. That's it.
    the content repo).
 4. Netlify reads [`netlify.toml`](netlify.toml) automatically, so the build
    command and publish directory are already filled in. Click **Deploy**.
+5. Check the branch Netlify will deploy: **Project configuration → Build &
+   deploy → Continuous Deployment → Branches and deploy contexts → Configure**,
+   and set **Production branch** to `main`.
+
+   This is worth checking rather than assuming. Netlify records the branch as it
+   was when you imported the project, and it does **not** follow later changes to
+   the repository's default branch — so if the two drift apart, pushes stop
+   deploying with no error anywhere.
 
 The first deploy will **fail** — expected, the secrets below aren't set yet.
 
 ### 2. Set the family password
 
-**Site configuration → Environment variables → Add a variable**
+**Project configuration → Environment variables → Add a variable**
+(older dashboards call this section "Site configuration")
 
 - `HHC_PASSWORD` — the shared password everyone will type (tick "Contains
   secret values").
@@ -151,7 +166,7 @@ Then **Deploys → Trigger deploy → Deploy site**. It should go green.
 
 So that adding a club rebuilds the site:
 
-1. Netlify: **Site configuration → Build & deploy → Build hooks → Add build
+1. Netlify: **Project configuration → Build & deploy → Build hooks → Add build
    hook**. Copy the URL.
 2. GitHub → **`HalfHourClub_Content`** → **Settings → Secrets and variables →
    Actions → New repository secret**:
