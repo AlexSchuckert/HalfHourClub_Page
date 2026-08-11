@@ -119,14 +119,33 @@ content repo) and by the form (to write to it).
 Now add three more Netlify environment variables:
 
 - `HHC_GH_APP_ID` — the App ID from step 2
-- `HHC_GH_APP_PRIVATE_KEY` — the **entire** contents of the `.pem` file,
-  including the `-----BEGIN…` and `-----END…` lines (tick "Contains secret
-  values"). Netlify's box is single-line; pasting with literal `\n` between the
-  lines works too — [`scripts/gh-app-token.mjs`](scripts/gh-app-token.mjs)
-  accepts either.
 - `HHC_GH_APP_INSTALLATION_ID` — the number from step 5
+- `HHC_GH_APP_PRIVATE_KEY` — the private key (tick "Contains secret values").
+  **Store it base64-encoded** — Netlify's field is single line, and a PEM is
+  not:
+
+  ```bash
+  base64 -w0 your-app-key.pem      # macOS: base64 -i your-app-key.pem
+  ```
+
+  Paste that one line as the value; the build decodes it. Pasting the raw PEM
+  usually works too — [`scripts/gh-app-token.mjs`](scripts/gh-app-token.mjs)
+  repairs newlines turned into spaces, literal `\n`, CRLF, stray quotes and
+  missing `BEGIN`/`END` markers — but base64 has nothing left to mangle.
 
 Then **Deploys → Trigger deploy → Deploy site**. It should go green.
+
+> **If the build fails with `error:1E08010C:DECODER routines::unsupported`**,
+> that's this key. It reads like a Node or OpenSSL version problem and isn't —
+> the PEM lost its line breaks on the way into the settings field. Check the
+> value without deploying:
+>
+> ```bash
+> HHC_GH_APP_PRIVATE_KEY='<paste the value>' npm run check:key
+> ```
+>
+> It reports whether the key parses, and says what to fix if not, without ever
+> printing the key itself.
 
 ### 5. Make new clubs publish themselves
 

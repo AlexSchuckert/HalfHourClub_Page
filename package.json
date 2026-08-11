@@ -9,7 +9,9 @@
     "build": "bash scripts/build.sh",
     "eleventy": "eleventy",
     "test": "bash test/run.sh",
-    "test:functions": "node test/functions.test.mjs"
+    "test:functions": "node test/functions.test.mjs",
+    "test:key": "node test/private-key.test.mjs",
+    "check:key": "node scripts/gh-app-token.mjs --check"
   },
   "dependencies": {
     "@11ty/eleventy": "^3.1.6",

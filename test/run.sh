@@ -12,6 +12,10 @@ PORT="${HHC_TEST_PORT:-8899}"
 export HHC_TEST_URL="http://localhost:${PORT}"
 export HHC_TEST_PASSWORD="test-family-password"
 
+echo "── Private key handling ──────────────────────────────"
+node test/private-key.test.mjs
+
+echo
 echo "── Functions ─────────────────────────────────────────"
 node test/functions.test.mjs
 

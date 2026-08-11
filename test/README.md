@@ -26,6 +26,19 @@ Both honour `HHC_TEST_URL` (default `http://localhost:8899`), and the site test
 honours `HHC_TEST_PASSWORD`. Chromium is located automatically; override with
 `CHROMIUM_PATH` if needed.
 
+## `private-key.test.mjs` — 18 checks
+
+Runs on its own (`npm run test:key`), no browser or build needed.
+
+The GitHub App key has to survive being pasted into a single-line settings
+field, and every mangling here has been seen for real: newlines turned into
+spaces or tabs, literal `\n`, CRLF, surrounding quotes, `BEGIN`/`END` markers
+lost, the whole PEM base64-encoded. Each one used to fail with the same
+misleading `error:1E08010C:DECODER routines::unsupported`. The checks confirm
+each form still signs verifiably, that genuinely bad input fails with a message
+that says what to do, and that **no error message ever quotes key material** —
+build logs are kept.
+
 ## `site.test.mjs` — 22 checks
 
 The reading experience, against the encrypted output:
