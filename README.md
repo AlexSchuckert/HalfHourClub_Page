@@ -13,13 +13,18 @@ club from the same page.
 | Repo | Holds | Who can write |
 |------|-------|---------------|
 | **`HalfHourClub_Content`** (private) | The archive: club markdown, photos, videos | Anyone with the family password, through the site's form |
-| **`HalfHourClub_Page`** (this one, public) | Build pipeline, theme, functions | Only you |
+| **`HalfHourClub_Page`** (this one) | Build pipeline, theme, functions | Only you |
 
-**No secret lives in either repo.** The family password, the publish key and the
-GitHub App key are all Netlify environment variables, which is why this repo can
-be public without exposing anything. The one credential-shaped thing committed
-here is StatiCrypt's salt in `scripts/build.sh`, and that is published inside
-every page by design — only the password protects the content.
+**No secret lives in either repo**, whichever visibility you give them. The
+family password, the publish key and the GitHub App key are all Netlify
+environment variables. The one credential-shaped thing committed here is
+StatiCrypt's salt in `scripts/build.sh`, and that is published inside every page
+by design — only the password protects the content.
+
+Private is still the better default for this repo: there's no upside to public
+(it runs no GitHub Actions, and nothing fetches it by URL), and private means an
+accidental commit of something private can't leak. Netlify builds private repos
+on the free plan.
 
 The split is a deliberate safety boundary, the same one the mooring wiki uses.
 The credential the publishing form gets can write to the *content* repo only,
@@ -43,7 +48,7 @@ either.
         │                    browser commits straight to GitHub
         │                    (one commit, media included)
         ▼                                              ▼
-  HalfHourClub_Page (public)   ◀── build ───  HalfHourClub_Content (private)
+  HalfHourClub_Page            ◀── build ───  HalfHourClub_Content (private)
    Eleventy templates, theme,     fetch         clubs/**.md + media/
    functions, build scripts       content       push → Action → build hook
 ```
