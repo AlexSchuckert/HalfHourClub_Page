@@ -1,4 +1,4 @@
-# Half Hour Club (build repo)
+# Half Hour Clubs (build repo)
 
 A private, password-protected archive of our **half hour clubs** — thirty-minute
 sessions where the family makes something from a shared prompt. **Netlify**

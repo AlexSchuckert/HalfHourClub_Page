@@ -59,8 +59,8 @@ npx --yes staticrypt@3.5.4 _site --recursive --short \
   --salt 0a72f195e7473ba8fa77a858d0e70e2e \
   --remember 365 \
   --template templates/gate.html \
-  --template-title "Half Hour Club" \
-  --template-instructions "Thirty minutes, one prompt, whatever we make. Enter the family password to look inside." \
+  --template-title "Half Hour Clubs" \
+  --template-instructions "Enter the family password to look inside." \
   --template-button "Come in" \
   --template-placeholder "Family password" \
   --template-remember "Stay signed in on this device" \

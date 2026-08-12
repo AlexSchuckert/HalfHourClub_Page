@@ -236,7 +236,6 @@ function addContribution(initial = {}) {
     spellChecker: false,
     autoDownloadFontAwesome: false,
     status: false,
-    placeholder: 'The poem, the story, a note about the drawing…',
     toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', '|', 'preview', 'guide'],
   });
 

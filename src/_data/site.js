@@ -10,8 +10,7 @@
  */
 
 export default {
-  title: 'Half Hour Club',
-  tagline: 'Thirty minutes, one prompt, whatever we make',
+  title: 'Half Hour Clubs',
 
   publishKey: process.env.HHC_PUBLISH_KEY || '',
 

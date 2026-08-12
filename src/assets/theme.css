@@ -154,13 +154,6 @@ a:hover {
   text-decoration: none;
 }
 
-.masthead__tagline {
-  color: var(--muted);
-  font-style: italic;
-  font-size: 0.95rem;
-  margin: 0.15rem 0 0;
-}
-
 /* The browser's own `[hidden] { display: none }` lives in the UA stylesheet, so
    ANY author rule that sets `display` beats it — which quietly un-hides every
    `.button[hidden]` on the page. Restate it here, with weight, so `hidden`
