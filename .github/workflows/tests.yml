@@ -1,0 +1,41 @@
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.4', '8.5']
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: testing-only
+          MYSQL_DATABASE: hhc_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -ptesting-only"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_mysql, mbstring, fileinfo, gd, zip, sodium, curl
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer audit
+      - name: Integration tests (hhc_test only)
+        env:
+          HHC_TEST_DB_USER: root
+          HHC_TEST_DB_PASSWORD: testing-only
+        run: php tests/run.php
+      - name: HTTP checks
+        run: |
+          php -r '$c=require "storage/tests/config.php"; $c["url"]="http://127.0.0.1:8001"; file_put_contents("storage/tests/config.php","<?php return ".var_export($c,true).";");'
+          HHC_CONFIG="$PWD/storage/tests/config.php" php bin/console.php install
+          HHC_CONFIG="$PWD/storage/tests/config.php" HHC_NEW_PASSWORD=ci-password-123 php bin/console.php password
+          HHC_CONFIG="$PWD/storage/tests/config.php" php -S 127.0.0.1:8001 -t public public/router.php > /tmp/server.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:8001/health/ && break || sleep 1; done
+          HHC_TEST_URL=http://127.0.0.1:8001 HHC_TEST_PASSWORD=ci-password-123 bash tests/http.sh

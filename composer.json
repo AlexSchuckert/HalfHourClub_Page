@@ -1,0 +1,19 @@
+{
+  "name": "halfhourclubs/archive",
+  "description": "A password-protected archive of Half Hour Clubs, in PHP and MySQL",
+  "type": "project",
+  "require": {
+    "php": "^8.3",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-mbstring": "*",
+    "ext-fileinfo": "*",
+    "ext-gd": "*",
+    "ext-zip": "*",
+    "ext-sodium": "*",
+    "ext-curl": "*",
+    "league/commonmark": "^2.7"
+  },
+  "scripts": { "test": "php tests/run.php" },
+  "config": { "sort-packages": true }
+}

@@ -1,0 +1,20 @@
+Options -Indexes
+DirectoryIndex index.php
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [END,QSA]
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Assets are referenced with ?v=<content hash>, so a changed file gets a new
+# URL and browsers may keep every version for a year.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|mjs|woff2|png|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+AddType text/javascript .mjs

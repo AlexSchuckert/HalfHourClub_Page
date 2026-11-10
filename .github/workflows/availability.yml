@@ -1,0 +1,20 @@
+name: Website availability
+# Checks the live site's /health/ page (HTTPS + database) every 15 minutes.
+# Set the repository variable HEALTH_URL (Settings → Secrets and variables →
+# Actions → Variables), e.g. https://your-address/health/. Until then it skips.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '11,26,41,56 * * * *'
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    if: vars.HEALTH_URL != ''
+    steps:
+      - name: Check HTTPS and database health
+        run: |
+          curl --fail --silent --show-error --connect-timeout 10 --max-time 20 --retry 2 --retry-delay 10 --retry-all-errors "${{ vars.HEALTH_URL }}" > /tmp/health
+          test "$(cat /tmp/health)" = ok
