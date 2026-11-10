@@ -103,15 +103,27 @@ function geocode(array $in): array {
     rate_limit('geocode', 60, 3600);
     $lat = $in['latitude'] ?? null; $lon = $in['longitude'] ?? null;
     if (!is_numeric($lat) || !is_numeric($lon) || abs((float)$lat) > 90 || abs((float)$lon) > 180) throw new HttpError(400, 'Those are not coordinates.');
-    $url = 'https://nominatim.openstreetmap.org/reverse?' . http_build_query(['format' => 'jsonv2', 'lat' => sprintf('%.5f', $lat), 'lon' => sprintf('%.5f', $lon), 'zoom' => 14, 'addressdetails' => 1]);
+    // %F, not %f: never a locale's decimal comma.
+    $url = 'https://nominatim.openstreetmap.org/reverse?' . http_build_query(['format' => 'jsonv2', 'lat' => sprintf('%.5F', $lat), 'lon' => sprintf('%.5F', $lon), 'zoom' => 14, 'addressdetails' => 1]);
     $curl = curl_init($url);
-    curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_USERAGENT => 'HalfHourClubs (private family archive)', CURLOPT_HTTPHEADER => ['Accept-Language: en']]);
+    // Nominatim's usage policy asks for a User-Agent and Referer that identify the site.
+    curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_USERAGENT => 'HalfHourClubs/1.0 (private family archive; ' . config('url') . ')',
+        CURLOPT_REFERER => config('url') . '/', CURLOPT_HTTPHEADER => ['Accept-Language: en']]);
     $body = curl_exec($curl);
-    $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-    if ($body === false || $status !== 200) throw new HttpError(502, 'The location lookup is not answering right now.');
-    $a = json_decode($body, true)['address'] ?? [];
+    $status = (int)curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    return ['location' => place_label($status, $body === false ? curl_error($curl) : $body)];
+}
+
+/** The settlement, then the region: "Kardamyli, Messenia", never a street address. */
+function place_label(int $status, string $body): string {
+    $reply = json_decode($body, true);
+    if ($status !== 200 || !is_array($reply) || !isset($reply['address'])) {
+        error_log('Half Hour Clubs geocode: HTTP ' . $status . ' ' . substr(preg_replace('/\s+/', ' ', $body), 0, 200));
+        $reason = is_array($reply) && is_string($reply['error'] ?? null) ? $reply['error'] : ($status ? "HTTP $status" : 'no connection');
+        throw new HttpError(502, "OpenStreetMap could not name this place ($reason). Type it in instead.");
+    }
+    $a = $reply['address'];
     $place = $a['village'] ?? $a['hamlet'] ?? $a['town'] ?? $a['suburb'] ?? $a['city'] ?? $a['municipality'] ?? null;
     $region = $a['county'] ?? $a['state_district'] ?? $a['state'] ?? null;
-    $label = implode(', ', array_filter([$place, $place && $region !== $place ? $region : null]));
-    return ['location' => $label ?: ($a['country'] ?? '')];
+    return implode(', ', array_filter([$place, $place && $region !== $place ? $region : null])) ?: (string)($a['country'] ?? '');
 }

@@ -131,6 +131,15 @@ check('Deleted clubs disappear from lists and addresses', !find_club($withPhoto[
 purge_orphans();
 check('…but keep their files, so undelete brings everything back', (bool)one('SELECT 1 FROM media WHERE name = ?', [$m['name']]));
 
+echo "\nLOCATION\n";
+require_once ROOT . '/app/Http.php';
+ini_set('error_log', $storage . '/php-errors.log');
+check('A village and its region make the label', place_label(200, '{"address":{"village":"Kardamyli","county":"Messenia","country":"Greece"}}') === 'Kardamyli, Messenia');
+check('The country is the fallback', place_label(200, '{"address":{"country":"Greece"}}') === 'Greece');
+check('An error reply says why, instead of an empty location', str_contains(throws(fn() => place_label(200, '{"error":"Unable to geocode"}')), 'Unable to geocode'));
+check('A refusal shows its status', str_contains(throws(fn() => place_label(403, '<html>Access blocked</html>')), 'HTTP 403'));
+check('No connection is reported as such', str_contains(throws(fn() => place_label(0, 'Could not resolve host')), 'no connection'));
+
 echo "\nBACKUP AND RESTORE\n";
 $key = "$storage/backup.key"; file_put_contents($key, bin2hex(random_bytes(32)));
 $before = [];

@@ -92,7 +92,9 @@ async function detectLocation({ quiet = false } = {}) {
     }
   } catch (error) {
     // A denied permission is a normal answer, not a failure worth shouting about.
-    locationHint.textContent = quiet ? '' : 'Could not get your location — type it in instead.';
+    // Anything else came from the server, which says what went wrong.
+    const fromPhone = typeof GeolocationPositionError !== 'undefined' && error instanceof GeolocationPositionError;
+    locationHint.textContent = quiet ? '' : fromPhone ? 'Could not get your location — type it in instead.' : error.message;
   }
 }
 
