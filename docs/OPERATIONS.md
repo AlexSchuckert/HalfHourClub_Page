@@ -44,13 +44,15 @@ must not be web-reachable.
 1. **Database.** In the Alwaysdata admin: *Databases → MySQL → Add a database*,
    e.g. `agendacollectif_hhc`, and *Add a user* with access to **that database
    only**. Don't reuse the agenda's database user.
-2. **Site.** *Web → Sites → Add a site*: type PHP, root
-   `/home/agendacollectif/halfhourclubs/current/public`, and an address.
-   `agendacollectif.alwaysdata.net` is the agenda's, so give this site its own
-   domain or subdomain, e.g. `clubs.<a domain you own>` (the Small plan allows
-   your own domains). Using its own domain also means the family never sees the
-   agenda's name, and the address survives removing the agenda. Enable *Force
-   HTTPS*.
+2. **Site.** The address is **`halfhourclubs.com`**. Add it under *Domains →
+   Add a domain*. Then add a site under *Web → Sites → Add a site*: type PHP,
+   addresses `halfhourclubs.com`, root
+   `/home/agendacollectif/halfhourclubs/current/public`, with *Force HTTPS* on.
+   Add a second site of type *Redirect* from `www.halfhourclubs.com` to
+   `https://halfhourclubs.com`, so everyone signs in on one address (sign-in is
+   per address). Then point the domain's DNS at Alwaysdata: either set its
+   nameservers to Alwaysdata's, or keep the DNS where it is and add the records
+   the admin shows. Alwaysdata issues the HTTPS certificate once DNS points at it.
 3. **PHP limits.** Videos are compressed in the browser to 50 MB at most.
    `public/.user.ini` raises the upload limits to match
    (`upload_max_filesize=60M`, `post_max_size=64M`). If the host ignores
@@ -72,7 +74,7 @@ must not be web-reachable.
    chmod 600 ~/halfhourclubs/shared/config.local.php
    # then edit it and set:
    #   'env' => 'production'
-   #   'url' => 'https://<the address from step 2>'
+   #   'url' => 'https://halfhourclubs.com'
    #   'dsn' => 'mysql:host=mysql-agendacollectif.alwaysdata.net;dbname=agendacollectif_hhc;charset=utf8mb4'
    #   'db_user', 'db_password' from step 1
    #   'storage' => '/home/agendacollectif/halfhourclubs/shared/storage'
@@ -122,7 +124,7 @@ must not be web-reachable.
    of the account.
 
 10. **Uptime.** Set the repository variable `HEALTH_URL` to
-    `https://<your address>/health/` and `.github/workflows/availability.yml`
+    `https://halfhourclubs.com/health/` and `.github/workflows/availability.yml`
     checks it every 15 minutes.
 
 ## Deploying an update
@@ -171,8 +173,8 @@ Remove the agenda's pieces one by one, and **do not delete the account**:
   `~/halfhourclubs` alone.
 
 Half Hour Clubs keeps running throughout. The account keeps its name; that only
-shows in paths and the `mysql-agendacollectif` host, not to the family, as long
-as the site has its own address (step 2).
+shows in paths and the `mysql-agendacollectif` host, not to the family, since the
+site has its own address, `halfhourclubs.com`.
 
 ## Disk space
 
