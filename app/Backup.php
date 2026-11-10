@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /*
- * Encrypted backups, the same design as the agenda's: a ZIP of every table as
+ * Encrypted backups: a ZIP of every table as
  * JSON plus every media original, encrypted with libsodium's authenticated
  * streaming encryption. Restore refuses a non-empty database and checks every
  * file's checksum. Display copies are not backed up; they regenerate.
@@ -53,6 +53,8 @@ function decrypt_backup(string $source, string $destination, string $key): void 
     } finally { fclose($in); fclose($out); }
 }
 
+const BACKUPS_KEPT = 7;
+
 function create_backup(string $keyFile): string {
     $key = backup_key($keyFile);
     $dir = media_dir('backups');
@@ -72,7 +74,9 @@ function create_backup(string $keyFile): string {
         $target = $dir . '/halfhourclubs-' . gmdate('Ymd-His') . '-' . substr(new_id(), 0, 6) . '.enc';
         encrypt_backup($temp, "$target.part", $key);
         if (!rename("$target.part", $target)) throw new RuntimeException('Could not commit the encrypted backup.');
-        foreach (glob("$dir/halfhourclubs-*.enc") ?: [] as $file) if (filemtime($file) < time() - 30 * 86400) unlink($file);
+        // Each backup is a full copy of every photo and video, so keep only the newest few.
+        $all = glob("$dir/halfhourclubs-*.enc") ?: []; sort($all);
+        foreach (array_slice($all, 0, -BACKUPS_KEPT) as $file) unlink($file);
         return $target;
     } finally {
         if (is_file($temp)) unlink($temp);
