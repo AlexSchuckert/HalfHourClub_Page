@@ -51,12 +51,16 @@ const parseContributors = (value) =>
 
 /* --------------------------------------------------------- club-level form */
 
-/** Date and time prefilled to now, with the session running the usual half hour. */
+/**
+ * Date and time prefilled for a club that has just finished: it ends now and
+ * started the usual half hour ago. The date is the start's, so a club that
+ * ran over midnight keeps the day it began.
+ */
 function prefillDateAndTime() {
-  const now = new Date();
-  const end = new Date(now.getTime() + 30 * 60 * 1000);
-  form.elements.date.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  form.elements.start.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const end = new Date();
+  const start = new Date(end.getTime() - 30 * 60 * 1000);
+  form.elements.date.value = `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`;
+  form.elements.start.value = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
   form.elements.end.value = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
 }
 
