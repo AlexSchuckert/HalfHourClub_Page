@@ -16,10 +16,12 @@ $config = [
     ] : null,
 ];
 ?>
+<?php if ($club): ?>
 <div class="page-heading">
-  <p class="page-heading__kicker"><?= $club ? 'Editing' : 'New' ?></p>
-  <h2 class="page-heading__title"><?= $club ? h($club['title']) : 'Half hour club' ?></h2>
+  <p class="page-heading__kicker">Editing</p>
+  <h2 class="page-heading__title"><?= h($club['title']) ?></h2>
 </div>
+<?php endif ?>
 
 <form id="club-form" novalidate>
   <section class="panel form-section">
