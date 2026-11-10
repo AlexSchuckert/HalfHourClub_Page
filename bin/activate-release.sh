@@ -14,14 +14,18 @@
 set -euo pipefail
 APP=${HHC_APP:-$HOME/halfhourclubs}
 ZIP=${1:?Give the release zip to activate}
+[ -f "$ZIP" ] || { echo "No such file: $ZIP" >&2; exit 1; }
 [ -f "$APP/shared/config.local.php" ] || { echo "Create $APP/shared/config.local.php first (see docs/OPERATIONS.md)." >&2; exit 1; }
 STAMP=$(basename "$ZIP" .zip | sed 's/^halfhourclubs-//')
 DEST="$APP/releases/$STAMP"
 [ -e "$DEST" ] && { echo "$DEST already exists." >&2; exit 1; }
+# If anything below fails, remove the half-made release so this can simply be run again.
+trap 'rm -rf "$DEST"; echo "Activation failed (see the error above). Nothing was switched; fix it and run this again." >&2' ERR
 mkdir -p "$DEST" && unzip -q "$ZIP" -d "$DEST"
 ln -s "$APP/shared/config.local.php" "$DEST/config.local.php"
 rmdir "$DEST/storage" 2>/dev/null || true
 chmod -R go-rwx "$DEST" && chmod -R go+rX "$DEST/public"   # only public/ is readable by the web server
 ( cd "$DEST" && php bin/console.php install )                # tables use IF NOT EXISTS: safe to repeat
 ln -sfn "$DEST" "$APP/current.next" && mv -Tf "$APP/current.next" "$APP/current"
+trap - ERR
 echo "Active: $DEST"
