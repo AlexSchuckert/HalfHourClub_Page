@@ -3,9 +3,9 @@
 A private, password-protected archive of our **half hour clubs**: thirty-minute
 sessions where the family makes something from a shared prompt.
 
-It's a small PHP and MySQL site, hosted in an Alwaysdata account of its own.
-Saving a club takes about a tenth of a second, and the club is live straight
-away.
+It's a small PHP and MySQL site, hosted on Alwaysdata as a separate site in
+the agenda's account. Saving a club takes about a tenth of a second, and the
+club is live straight away.
 
 - **One family password**, asked once per device. The sign-in lasts a year.
 - An **Edit** button at the top right of every club page opens that club in the

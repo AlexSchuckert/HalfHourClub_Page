@@ -3,7 +3,7 @@
 #
 #   bash activate-release.sh /path/to/halfhourclubs-YYYYMMDD-HHMMSS.zip
 #
-# Layout (under $APP, default ~/app in the Half Hour Clubs account):
+# Layout (under $APP, default ~/halfhourclubs):
 #   releases/<timestamp>/   one unpacked release each; old ones are kept
 #   current -> releases/…   what the site and the scheduled job use
 #   shared/config.local.php private settings, never inside a release
@@ -12,7 +12,7 @@
 # The switch is a single symlink rename, so visitors never see half a release.
 # To roll back, point `current` at the previous release the same way.
 set -euo pipefail
-APP=${HHC_APP:-$HOME/app}
+APP=${HHC_APP:-$HOME/halfhourclubs}
 ZIP=${1:?Give the release zip to activate}
 [ -f "$APP/shared/config.local.php" ] || { echo "Create $APP/shared/config.local.php first (see docs/OPERATIONS.md)." >&2; exit 1; }
 STAMP=$(basename "$ZIP" .zip | sed 's/^halfhourclubs-//')
