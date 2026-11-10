@@ -7,7 +7,12 @@ $configFile = getenv('HHC_CONFIG') ?: ROOT . '/config.local.php';
 if (!is_file($configFile)) {
     throw new RuntimeException('Copy config.example.php to config.local.php and configure it.');
 }
+ob_start();
 $GLOBALS['config'] = require $configFile;
+if (ob_get_clean() !== '') {
+    // Text before <?php in the config would be sent ahead of every page and API reply.
+    throw new RuntimeException("$configFile has something before <?php on its first line (or after the closing ]; ). Remove it.");
+}
 if (is_file(ROOT . '/vendor/autoload.php')) require ROOT . '/vendor/autoload.php';
 foreach (['Database', 'Support', 'Auth', 'Clubs', 'Media', 'Markdown'] as $module) require_once __DIR__ . '/' . $module . '.php';
 if (!preg_match('/^[a-f0-9]{64}$/D', (string)config('secret'))) {

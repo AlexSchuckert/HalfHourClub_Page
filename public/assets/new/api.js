@@ -11,8 +11,10 @@ async function post(path, body) {
     headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': config.csrf },
     body: JSON.stringify(body),
   });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(explain(response.status, data.error));
+  const data = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(explain(response.status, data?.error));
+  // An unreadable reply must not be mistaken for an answer (it once sent the page to /new/undefined).
+  if (data === null) throw new Error('The server sent a reply this page could not read. Your club may have saved: check the calendar before trying again.');
   return data;
 }
 
